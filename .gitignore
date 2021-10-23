@@ -1,3 +1,11 @@
+# Test file
+*test.py
+
+# Swap files
+*.swp
+
+# Documents
+*.docx
 
 # HTML files
 *.html
