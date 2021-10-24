@@ -23,34 +23,6 @@ class OpenStratKernel:
         self.scraper = SymbolScraper()
         self.parser = CSVParser() 
 
-    def load_symbols(self) -> None:
-        message1 = "Loading Stock Symbols..."
-        message2 = "[OK] Loaded Stock Symbols"
-        if self.VERBOSE:print(message1)
-        #=====================================================
-        symbol_data = self.scraper.fetch_symbols()
-        self.symbols = self.parser.text_to_dataframe(symbol_data) 
-        #=====================================================
-        if self.VERBOSE:print(message2)
-
-    def start_browser_engine(self) -> None:
-        message1 = f"Starting {self.BROWSER} Browser Engine..."
-        message2 = f"[OK] Started {self.BROWSER} Browser Engine"
-        if self.VERBOSE:print(message1)
-        #=====================================================
-        self.bot = BotMaker(browser=self.BROWSER, behead=self.HEADLESS_MODE)
-        #=====================================================
-        if self.VERBOSE:print(message2)
-
-    def shutdown_browser_engine(self) -> None:
-        message1 = f"Stopping {self.BROWSER} Browser Engine..."
-        message2 = f"[OK] Stopped {self.BROWSER} Browser Engine"
-        if self.VERBOSE:print(message1)
-        #=====================================================
-        self.bot.shutdown()
-        #=====================================================
-        if self.VERBOSE:print(message2)
-
     def __click_body(self) -> None:
         self.bot.get_element('body').click()
 
@@ -91,6 +63,34 @@ class OpenStratKernel:
         price_elem = gfather.find_all('span')[3] 
         price = price_elem.text
         return price
+
+    def load_symbols(self) -> None:
+        message1 = "Loading Stock Symbols..."
+        message2 = "[OK] Loaded Stock Symbols"
+        if self.VERBOSE:print(message1)
+        #=====================================================
+        symbol_data = self.scraper.fetch_symbols()
+        self.symbols = self.parser.text_to_dataframe(symbol_data) 
+        #=====================================================
+        if self.VERBOSE:print(message2)
+
+    def start_browser_engine(self) -> None:
+        message1 = f"Starting {self.BROWSER} Browser Engine..."
+        message2 = f"[OK] Started {self.BROWSER} Browser Engine"
+        if self.VERBOSE:print(message1)
+        #=====================================================
+        self.bot = BotMaker(browser=self.BROWSER, behead=self.HEADLESS_MODE)
+        #=====================================================
+        if self.VERBOSE:print(message2)
+
+    def shutdown_browser_engine(self) -> None:
+        message1 = f"Stopping {self.BROWSER} Browser Engine..."
+        message2 = f"[OK] Stopped {self.BROWSER} Browser Engine"
+        if self.VERBOSE:print(message1)
+        #=====================================================
+        self.bot.shutdown()
+        #=====================================================
+        if self.VERBOSE:print(message2)
 
     def load_calendar_call(self, symbol:str):
         """Loads the URL in browser engine for symbol calendar call."""
