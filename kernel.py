@@ -24,8 +24,8 @@ class OpenStratKernel:
         self.bot = None
         self.scraper = SymbolScraper()
         self.parser = CSVParser() 
-        self.front_month_indx = self.__FMONTH_START
-        self.back_month_indx = self.__BMONTH_START
+        self.fmonth_indx = self.__FMONTH_START
+        self.bmonth_indx = self.__BMONTH_START
 
     def __click_body(self) -> None:
         self.bot.get_element_by_tag('body').click()
@@ -67,6 +67,18 @@ class OpenStratKernel:
         price_elem = gfather.find_all('span')[3] 
         price = price_elem.text
         return price
+
+    def __get_fmonth(self, soup) -> str:
+        elem = soup.find('div', {"class":re.compile('^StrategyDetails_input__header__')})
+        span = elem.find('span')
+        date = span.text
+        return date
+
+    def __get_bmonth(self, soup) -> str:
+        elem = soup.find_all('div', {"class":re.compile('^StrategyDetails_input__header__')})[1]
+        span = elem.find('span')
+        date = span.text
+        return date
 
     def load_symbols(self) -> None:
         message1 = "Loading Stock Symbols..."
@@ -117,19 +129,25 @@ class OpenStratKernel:
             Format:
                 keys = {'NetDebit', 'MaxLoss', 'MaxFormat', 'BreakEvens', 'ChanceOfProfit'}
         """
-        info = {'NetDebit':None,
+        info = {'FrontMonth':None,
+                'BackMonth':None,
+                'NetDebit':None,
                 'MaxLoss':None,
                 'MaxProfit':None,
                 'BreakEvens':None,
                 'ChanceOfProfit':None}
 
         soup = self.__prepare_soup()
+        front_month = self.__get_front_month(soup)
+        back_month = self.__get_back_month(soup)
         net_debit = self.__get_net_debit(soup)
         max_loss = self.__get_max_loss(soup)
         max_profit = self.__get_max_profit(soup)
         break_evens = self.__get_breakevens(soup)
         chance_of_profit = self.__get_chance_of_profit(soup)
 
+        info['FrontMonth'] = front_month
+        info['BackMonth'] = back_month
         info['NetDebit'] = net_debit
         info['MaxLoss'] = max_loss 
         info['MaxProfit'] = max_profit 
