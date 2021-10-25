@@ -24,7 +24,7 @@ class OpenStratKernel:
         self.parser = CSVParser() 
 
     def __click_body(self) -> None:
-        self.bot.get_element('body').click()
+        self.bot.get_element_by_tag('body').click()
 
     def __prepare_soup(self) -> bs4.BeautifulSoup:
         return bs4.BeautifulSoup(self.bot.page_source(), 'lxml')
