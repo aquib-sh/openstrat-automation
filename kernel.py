@@ -5,6 +5,7 @@
     This is the only layer which OpenStrat bot will interact to get the service from other classes.
 """
 import io
+import re
 import bs4
 from bot import BotMaker
 from symbols import SymbolScraper
