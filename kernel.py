@@ -17,11 +17,15 @@ class OpenStratKernel:
         self.HEADLESS_MODE = False
         self.CALENDAR_CALL = "https://optionstrat.com/build/diagonal-call-spread/"
         self.VERBOSE = True
+        self.__FMONTH_START = 0
+        self.__BMONTH_START = 17
 
         self.symbols = None
         self.bot = None
         self.scraper = SymbolScraper()
         self.parser = CSVParser() 
+        self.front_month_indx = self.__FMONTH_START
+        self.back_month_indx = self.__BMONTH_START
 
     def __click_body(self) -> None:
         self.bot.get_element_by_tag('body').click()
@@ -133,6 +137,23 @@ class OpenStratKernel:
         info['ChanceOfProfit'] = chance_of_profit 
 
         return info
+
+    def goto_fmonth(self, indx):
+        all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
+        if ((indx < len(all_elems)) and (indx < self.__FMONTH_START)):
+            all_elems[indx].click()
+        else:
+            return
+
+    def goto_bmonth(self, indx):
+        all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
+        if ((indx < len(all_elems)) and (indx > self.__FMONTH_START)):
+            all_elems[indx].click()
+        else:
+            return
+
+
+
 
 
     
