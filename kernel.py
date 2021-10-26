@@ -5,6 +5,7 @@
     This is the only layer which OpenStrat bot will interact to get the service from other classes.
 """
 import io
+import time
 import re
 import bs4
 from bot import BotMaker
@@ -35,48 +36,100 @@ class OpenStratKernel:
         return bs4.BeautifulSoup(self.bot.page_source(), 'lxml')
 
     def __get_net_debit(self, soup) -> str:
-        elem = soup.find("span", string="Net Debit: ")
+        for i in range(0, 5):
+            elem = soup.find("span", string="Net Debit: ")
+            if elem != None: 
+                break
+            else: 
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         siblings = elem.parent.findChildren()
         price_elem = siblings[-1]
         price = price_elem.text
         return price
 
     def __get_max_loss(self, soup) -> str:
-        elem = soup.find("span", string="Max loss: ")
+        for i in range(0, 5):
+            elem = soup.find("span", string="Max loss: ")
+            if elem != None: 
+                break
+            else:
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         siblings = elem.parent.findChildren()
         price_elem = siblings[-1]
         price = price_elem.text
         return price
  
     def __get_max_profit(self, soup) -> str:
-        elem = soup.find("span", string="Max profit: ")
+        for i in range(0, 5):
+            elem = soup.find("span", string="Max profit: ")
+            if elem != None:
+                break
+            else:
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         siblings = elem.parent.findChildren()
         price_elem = siblings[-1]
         price = price_elem.text
         return price
         
     def __get_breakevens(self, soup) -> str:
-        elem = soup.find("span", string="Breakeven: ")
+        for i in range(0, 10):
+            elem = soup.find("span", string="Breakeven: ")
+            if elem == None:
+                elem = soup.find("span", string="Breakevens: ")
+            if elem != None:
+                break
+            else:
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         siblings = elem.parent.findChildren()
         price_elem = siblings[-3]
         price = price_elem.text
         return price
  
     def __get_chance_of_profit(self, soup) -> str:
-        elem = soup.find("span", string="Chance of Profit: ")
+        for i in range(0, 5):
+            elem = soup.find("span", string="Chance of Profit: ")
+            if elem != None:
+                break
+            else:
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         gfather = elem.parent.parent
         price_elem = gfather.find_all('span')[3] 
         price = price_elem.text
         return price
 
     def __get_fmonth(self, soup) -> str:
-        elem = soup.find('div', {"class":re.compile('^StrategyDetails_input__header__')})
+        for i in range(1, 10):
+            elem = soup.find('div', {"class":re.compile('^StrategyDetails_input__header__')})
+            if elem != None:
+                break
+            else:
+                time.sleep(1)
+                soup = self.__prepare_soup()
+
         span = elem.find('span')
         date = span.text
         return date
 
     def __get_bmonth(self, soup) -> str:
-        elem = soup.find_all('div', {"class":re.compile('^StrategyDetails_input__header__')})[1]
+        for i in range(0, 5):
+            elem = soup.find_all('div', {"class":re.compile('^StrategyDetails_input__header__')})
+            if elem != None:
+                elem = elem[1]
+                break
+            else:
+                time.sleep(1)     
+                soup = self.__prepare_soup()
+
         span = elem.find('span')
         date = span.text
         return date
@@ -139,8 +192,8 @@ class OpenStratKernel:
                 'ChanceOfProfit':None}
 
         soup = self.__prepare_soup()
-        front_month = self.__get_front_month(soup)
-        back_month = self.__get_back_month(soup)
+        front_month = self.__get_fmonth(soup)
+        back_month = self.__get_bmonth(soup)
         net_debit = self.__get_net_debit(soup)
         max_loss = self.__get_max_loss(soup)
         max_profit = self.__get_max_profit(soup)
@@ -157,19 +210,19 @@ class OpenStratKernel:
 
         return info
 
-    def goto_fmonth(self, indx):
+    def goto_fmonth(self, indx) -> int:
         all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
         if ((indx < len(all_elems)) and (indx < self.__FMONTH_START)):
             all_elems[indx].click()
-        else:
-            return
+            return 1
+        return -1
 
-    def goto_bmonth(self, indx):
+    def goto_bmonth(self, indx) -> int:
         all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
         if ((indx < len(all_elems)) and (indx > self.__FMONTH_START)):
             all_elems[indx].click()
-        else:
-            return
+            return 1
+        return -1
 
 
 
