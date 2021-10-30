@@ -123,7 +123,7 @@ class OpenStratKernel:
     def __get_bmonth(self, soup) -> str:
         for i in range(0, 5):
             elem = soup.find_all('div', {"class":re.compile('^StrategyDetails_input__header__')})
-            if elem != None:
+            if len(elem) != 0:
                 elem = elem[1]
                 break
             else:
@@ -134,6 +134,12 @@ class OpenStratKernel:
         date = span.text
         return date
 
+    def reset_bmonth_indx(self):
+        self.bmonth_indx = self.__BMONTH_START
+
+    def reset_fmonth_indx(self):
+        self.fmonth_indx = self.__FMONTH_START
+
     def load_symbols(self) -> None:
         message1 = "Loading Stock Symbols..."
         message2 = "[OK] Loaded Stock Symbols"
@@ -143,6 +149,12 @@ class OpenStratKernel:
         self.symbols = self.parser.text_to_dataframe(symbol_data) 
         #=====================================================
         if self.VERBOSE:print(message2)
+
+    def read_symbols(self) -> str:
+        """Yields next symbol."""
+        sym = self.symbols.keys()[1]
+        for i in range(len(self.symbols)):
+            yield (self.symbols.loc[i][sym])
 
     def start_browser_engine(self) -> None:
         message1 = f"Starting {self.BROWSER} Browser Engine..."
@@ -212,7 +224,7 @@ class OpenStratKernel:
 
     def goto_fmonth(self, indx) -> int:
         all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
-        if ((indx < len(all_elems)) and (indx < self.__FMONTH_START)):
+        if ((indx < len(all_elems)) and (indx < self.__BMONTH_START)):
             all_elems[indx].click()
             return 1
         return -1
