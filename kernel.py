@@ -223,7 +223,18 @@ class OpenStratKernel:
         return info
 
     def goto_fmonth(self, indx) -> int:
-        all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
+        all_elems = []
+        i = 0
+        while (i < 5):
+            try:
+                all_elems = self.bot.get_elements("//div[starts-with(@class, 'SeriesSelector_table__exp__')]")
+                break
+            except:
+                i += 1
+
+        if (i == 5): 
+            return -1
+
         if ((indx < len(all_elems)) and (indx < self.__BMONTH_START)):
             all_elems[indx].click()
             return 1
