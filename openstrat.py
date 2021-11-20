@@ -1,4 +1,5 @@
 import traceback
+import time
 from kernel import OpenStratKernel
 from util import DataHandler
 
@@ -36,8 +37,6 @@ class OpenStrat:
                 try: 
                     info = self.kernel.fetch_calendar_call_info()
                 except Exception as e:
-                    #print(e)
-                    #print(traceback.format_exc())
                     continue
                
                 info['Symbol'] = self.current_symbol
@@ -45,14 +44,26 @@ class OpenStrat:
                 print(".", end="", flush=True)
 
     def get_data_by_symbol_iteration(self):
+        i = 1
+        INTERVAL = 10
         self.kernel.load_symbols()
+        
         for symbol in self.kernel.read_symbols():
             self.current_symbol = symbol
+            
+            if (i % INTERVAL == 0):
+                print("[*] Sleeping for 5 mins to avoid loading server")
+                time.sleep(60*5)
+
             self.kernel.load_calendar_call(symbol)
             print("[+] Fetching info from page")
-            self.__fetch_and_put_info()
+            try:
+                self.__fetch_and_put_info()
+            except:
+                continue
             print("\n")
             print("====="*10)
+            i += 1
 
     def save_data(self, fname="data.csv"):
         data = self.handler.as_dataframe()
